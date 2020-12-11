@@ -27,10 +27,10 @@
 USAGE="Direct Execute: $BASH_SOURCE [HUC8 format watershed numbers text file]\nSubmit to SLURM: sbatch ${BASH_SOURCE#./} [HUC8 format watershed numbers text file]"  
 
 ######## Input file directories ##########
-export INPUT_DIR=/scratch/summit/cskenny@xsede.org
+export INPUT_DIR=/home/nicholas_klein_baer/input
 
 #name of DEM to calculate derivatives from
-export DEM=${INPUT_DIR}/DEP_10/NED_DEM_10m.tif
+export DEM=${INPUT_DIR}/id_ned_buffer_clip.tif
   #check if DEM file is missing
   if ! [[ -s $DEM ]]; then
        echo "DEM file $DEM does not exist or is empty"
@@ -38,14 +38,14 @@ export DEM=${INPUT_DIR}/DEP_10/NED_DEM_10m.tif
   fi
 
 #path to HUC8 watershed files. Both are needed because I clip by the unprojected shapefile and then trim with the projected shapefile.
-export indexA=${INPUT_DIR}/HUC8_Map/wbdhu8_a_us_september2017_CONUS_4269_validGeom.shp
+export indexA=${INPUT_DIR}/HUC8_All.shp
   #check if indexA is missing
   if ! [[ -s $indexA ]]; then
        echo "IndexA file $indexA does not exist or is empty"
        exit 1
   fi
 
-export indexB=${INPUT_DIR}/HUC8_Map/wbdhu8_a_us_september2017_CONUS_Albers_validGeom.shp
+export indexB=${INPUT_DIR}/HUC8_All_5070.shp
   #check if indexB is missing
   if ! [[ -s $indexB ]]; then
        echo "IndexB file $indexB does not exist or is empty"
@@ -54,7 +54,7 @@ export indexB=${INPUT_DIR}/HUC8_Map/wbdhu8_a_us_september2017_CONUS_Albers_valid
 
 #Set a primary and secondary buffer distance in number of pixels. The primary will be used when clipping the DEM by HUC8 watersheds. The secondary will be used to trim off edge effects of each derivative, but leave enough to feather the edges when mosaicking.
 export bufferA=100
-export bufferB=30
+export bufferB=20
 
 ######## Parse input and execute Geoprocess_single_watershed_DEP_10_v2.3.sh #########
 #check if HUC8 text file is missing

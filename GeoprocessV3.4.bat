@@ -13,24 +13,24 @@ REM Set needed paths.
 REM I found it easiest to install SAGA directly on the C drive. 
 REM modify the following paths to match your saga install
 REM path to saga_cmd.exe
-set PATH=%PATH%;C:\saga-6.2.0_x64
-set SAGA_MLB=C:\saga-6.2.0_x64\tools
+set PATH=%PATH%;C:\Program Files (x86)\SAGA-GIS
+set SAGA_MLB=C:\Program Files (x86)\SAGA-GIS\tools
 
 REM name of base DEM from which to calculate derivatives
-set DEM=C:\DEM\NM_5m_dtm.tif
+set DEM=E:\ID_DSM_Expanded_Study_Area\id_ned_buffer_clip.tif
 
 REM path to HUC8 watershed files. 
 REM Both are needed because I clip by the unprojected shapefile and then trim with the projected shapefile. 
 REM Use the following to gdal command to reproject shapefile if needed: ogr2ogr -f "ESRI Shapefile" wbdhu10_a_us_september2017_proj.shp wbdhu10_a_us_september2017.shp -t_srs EPSG:10200
 REM Oddly enough using two different projections seems to be key to removing border artefacts caused by buffering in. When I use a different projection to clip and reporject the border artifacts go away... Odd, but it works.
-set indexA=C:\DEM\wbdhu8_a_us_september2017_USboundCONUS.shp
-set indexB=C:\DEM\wbdhu8_a_us_september2017_USboundCONUS_proj.shp
+set indexA=E:\ID_DSM_Expanded_Study_Area\HUC8_All.shp
+set indexB=E:\ID_DSM_Expanded_Study_Area\HUC8_All_5070.shp
 
 rem The column name of the shapefiles attribute table with the HUC values. Use HUC8 for 10m DEM and HUC6 for 30m DEM
-set fieldname=HUC8
+set fieldname=huc8
 
 rem tiles are the names/values of each polygon. These must be manually input and can be identified as the watersheds that overlay your area of interest. 
-set tiles=13020211 13030103 13030101 13030102 13030202 13020210
+set tiles=17050121
 
 rem Set a primary and secondary buffer distance in number of pixels. The primary will be used when clipping the DEM by HUC8 watersheds. The secondary will be used to trim off edge effects of each derivative, but leave enough to feather the edges when mosaicking.
 set bufferA=100
@@ -56,6 +56,7 @@ REM CHANGE -t_srs if you want a different output projection. CHANGE -tr if you w
 REM it is also critical that you set a nodata values otherwise the covariates will be buffered in (as well as outside of the watershed boundary). 
 for %%i in (%tiles%) do (
  echo now subsetting %fieldname% %%i
+  echo "-t_srs EPSG:102008 -tr 10 10 -r bilinear -multi -dstnodata -9999 -cutline %indexA% -cwhere "%fieldname% = '%%i'" -crop_to_cutline -cblend %bufferA% -of SAGA %DEM% %%i\%%i.sdat"
   gdalwarp -t_srs EPSG:102008 -tr 10 10 -r bilinear -multi -dstnodata -9999 -cutline %indexA% -cwhere "%fieldname% = '%%i'" -crop_to_cutline -cblend %bufferA% -of SAGA %DEM% %%i\%%i.sdat
 )
   

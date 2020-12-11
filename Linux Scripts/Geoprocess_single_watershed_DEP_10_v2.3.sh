@@ -69,7 +69,7 @@ startTime=$(date +%F\ %H:%M:%S)
 
 ##############  1. Preprocessing  ##############
 #Create subdirectories to hold derivatives
-working_dir=/scratch/summit/cskenny@xsede.org/Result/HUC8/
+working_dir=/home/nicholas_klein_baer/outputs
 mkdir -p $working_dir/$tile
 
 #Compress image file function
