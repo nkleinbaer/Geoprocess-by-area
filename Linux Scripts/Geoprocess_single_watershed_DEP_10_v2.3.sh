@@ -86,7 +86,7 @@ function Compress()  # $1: "_" + "name of derivative"
 
 #Clip DEM to HUC8 watershed boundary.
 echo now subsetting $fieldname $tile
-gdalwarp --config GDAL_CACHEMAX 500 -wm 500 -multi -wo NUM_THREADS=$NumOfCore -t_srs "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0" -tr 10 10 -r bilinear -cutline $indexA -cwhere "$fieldname = '${tile}'" -crop_to_cutline -cblend $bufferA $DEM $working_dir/$tile/${tile}.tif
+gdalwarp --config GDAL_CACHEMAX 80% -wm 80% -multi -wo NUM_THREADS=$NumOfCore -t_srs "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0" -tr 10 10 -r bilinear -cutline $indexA -cwhere "$fieldname = '${tile}'" -crop_to_cutline -cblend $bufferA $DEM $working_dir/$tile/${tile}.tif
 
 #Smooth DEM to remove data artifacts using circle with radius of 4 cells) smoothing filter
 echo now smoothing $fieldname $tile
