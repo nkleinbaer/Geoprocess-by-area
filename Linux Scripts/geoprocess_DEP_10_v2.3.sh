@@ -27,7 +27,7 @@
 USAGE="Direct Execute: $BASH_SOURCE [HUC8 format watershed numbers text file]\nSubmit to SLURM: sbatch ${BASH_SOURCE#./} [HUC8 format watershed numbers text file]"  
 
 ######## Input file directories ##########
-export INPUT_DIR=/home/nicholas_klein_baer/input
+export INPUT_DIR=/home/nicholas_klein_baer/inputs
 
 #name of DEM to calculate derivatives from
 export DEM=${INPUT_DIR}/id_ned_buffer_clip.tif
@@ -71,6 +71,7 @@ if ! [[ -s $1 ]]; then
    for i in $(<$1); do
        #Geoprocess_single_watershed_DEP_10_v2.3.sh -n [number of core] [HUC8 tile number]
                                                       #Use all cores by default
+       echo %i
        source Geoprocess_single_watershed_DEP_10_v2.3.sh -n $(nproc) $i
    done
 fi

@@ -14,7 +14,7 @@
 USAGE="USAGE: $BASH_SOURCE -n [number of core] [HUC8 tile number]"
 
 #modify the following paths to match your saga install and datafiles.
-module load saga-6.4.0
+#module load saga-6.4.0
 
 #Parse input variables. These input variables are FIXED, change here if you want to change how this script takes input variable
 #Check number of input variables
@@ -69,6 +69,7 @@ startTime=$(date +%F\ %H:%M:%S)
 
 ##############  1. Preprocessing  ##############
 #Create subdirectories to hold derivatives
+echo $tile
 working_dir=/home/nicholas_klein_baer/outputs
 mkdir -p $working_dir/$tile
 
@@ -76,20 +77,20 @@ mkdir -p $working_dir/$tile
 function Compress()  # $1: "_" + "name of derivative"
 {
   echo "Compressing $(ls -lh $working_dir/$tile/${tile}${1}.tif) ..."
-  xz -T $NumOfCore -9 -k $working_dir/$tile/${tile}${1}.tif 
-  echo "Testing $(ls -lh $working_dir/$tile/${tile}${1}.tif.xz) ..."
-  xz -T $NumOfCore -t $working_dir/$tile/${tile}${1}.tif.xz 
+  pigz -9 $working_dir/$tile/${tile}${1}.tif 
+  echo "Testing $(ls -lh $working_dir/$tile/${tile}${1}.tif.gz) ..."
+  unpigz -k $working_dir/$tile/${tile}${1}.tif.gz 
   echo "Deleting $working_dir/$tile/${tile}${1}.tif ..."
   rm $working_dir/$tile/${tile}${1}.tif 
 }
 
 #Clip DEM to HUC8 watershed boundary.
 echo now subsetting $fieldname $tile
-gdalwarp --config GDAL_CACHEMAX 500 -wm 500 -multi -wo NUM_THREADS=$NumOfCore -t_srs "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0" -tr 10 10 -r bilinear -cutline $indexA -cwhere "$fieldname = '${tile}'" -crop_to_cutline -cblend $bufferA $DEM $working_dir/$tile/${tile}.tif
+gdalwarp --config GDAL_CACHEMAX 80% -wm 80% -multi -wo NUM_THREADS=$NumOfCore -t_srs "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0" -tr 10 10 -r bilinear -cutline $indexA -cwhere "$fieldname = '${tile}'" -crop_to_cutline -cblend $bufferA $DEM $working_dir/$tile/${tile}.tif
 
 #Smooth DEM to remove data artifacts using circle with radius of 4 cells) smoothing filter
 echo now smoothing $fieldname $tile
-$SAGA_parallel grid_filter 0 -INPUT=$working_dir/$tile/${tile}.tif -RESULT=$working_dir/$tile/${tile}_s.sgrd -METHOD=0 -KERNEL_TYPE=1 -KERNEL_RADIUS=2
+$SAGA_parallel grid_filter 0 -INPUT=$working_dir/$tile/${tile}.tif -RESULT=$working_dir/$tile/${tile}_s.sgrd -METHOD=0 -MODE=1 -RADIUS=4
 
 Compress
 
