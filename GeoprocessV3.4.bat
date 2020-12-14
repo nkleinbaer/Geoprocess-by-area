@@ -30,7 +30,7 @@ rem The column name of the shapefiles attribute table with the HUC values. Use H
 set fieldname=huc8
 
 rem tiles are the names/values of each polygon. These must be manually input and can be identified as the watersheds that overlay your area of interest. 
-set tiles=17050121
+set tiles=17040210 16020309 17040209 17040212 17040216 17040217 17040218 17040219 17040220 17040221 17050111 17050112 17050113 17050120 17050121 17050122 17050123 17050124 17060201 17060202 17060203 17060204 17060205 17060206 17060207 17060208 17060209 17060210 17060301 17040211 17060101 17010205 17040213 10020001 10020004 
 
 rem Set a primary and secondary buffer distance in number of pixels. The primary will be used when clipping the DEM by HUC8 watersheds. The secondary will be used to trim off edge effects of each derivative, but leave enough to feather the edges when mosaicking.
 set bufferA=100
