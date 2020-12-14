@@ -14,7 +14,7 @@
 USAGE="USAGE: $BASH_SOURCE -n [number of core] [HUC8 tile number]"
 
 #modify the following paths to match your saga install and datafiles.
-module load saga-6.4.0
+#module load saga-6.4.0
 
 #Parse input variables. These input variables are FIXED, change here if you want to change how this script takes input variable
 #Check number of input variables
@@ -69,6 +69,7 @@ startTime=$(date +%F\ %H:%M:%S)
 
 ##############  1. Preprocessing  ##############
 #Create subdirectories to hold derivatives
+echo $tile
 working_dir=/home/nicholas_klein_baer/outputs
 mkdir -p $working_dir/$tile
 
