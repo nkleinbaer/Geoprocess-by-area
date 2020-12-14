@@ -90,7 +90,7 @@ gdalwarp --config GDAL_CACHEMAX 80% -wm 80% -multi -wo NUM_THREADS=$NumOfCore -t
 
 #Smooth DEM to remove data artifacts using circle with radius of 4 cells) smoothing filter
 echo now smoothing $fieldname $tile
-$SAGA_parallel grid_filter 0 -INPUT=$working_dir/$tile/${tile}.tif -RESULT=$working_dir/$tile/${tile}_s.sgrd -METHOD=0 -KERNEL_TYPE=1 -KERNEL_RADIUS=2
+$SAGA_parallel grid_filter 0 -INPUT=$working_dir/$tile/${tile}.tif -RESULT=$working_dir/$tile/${tile}_s.sgrd -METHOD=0 -MODE=1 -RADIUS=4
 
 Compress
 
