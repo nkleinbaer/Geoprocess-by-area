@@ -77,9 +77,9 @@ mkdir -p $working_dir/$tile
 function Compress()  # $1: "_" + "name of derivative"
 {
   echo "Compressing $(ls -lh $working_dir/$tile/${tile}${1}.tif) ..."
-  xz -T $NumOfCore -9 -k $working_dir/$tile/${tile}${1}.tif 
-  echo "Testing $(ls -lh $working_dir/$tile/${tile}${1}.tif.xz) ..."
-  xz -T $NumOfCore -t $working_dir/$tile/${tile}${1}.tif.xz 
+  pigz -9 $working_dir/$tile/${tile}${1}.tif 
+  echo "Testing $(ls -lh $working_dir/$tile/${tile}${1}.tif.gz) ..."
+  unpigz -k $working_dir/$tile/${tile}${1}.tif.gz 
   echo "Deleting $working_dir/$tile/${tile}${1}.tif ..."
   rm $working_dir/$tile/${tile}${1}.tif 
 }
