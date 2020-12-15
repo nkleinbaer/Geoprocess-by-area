@@ -93,7 +93,7 @@ ogr2ogr -simplify .001 $cutline_shp $working_dir/$tile/${tile}.shp
 #Clip DEM to HUC8 watershed boundary.
 echo now subsetting $fieldname $tile
 gdalwarp -cutline $cutline_shp -crop_to_cutline -cblend $bufferA $DEM $working_dir/$tile/${tile}_tmp.tif
-gdalwarp -t_srs EPSG:5070 -tr 10 10 -r bilinear $working_dir/$tile/${tile}_tmp.tif -of SAGA $working_dir/$tile/${tile}.tif
+gdalwarp -t_srs EPSG:5070 -tr 10 10 -r bilinear $working_dir/$tile/${tile}_tmp.tif $working_dir/$tile/${tile}.tif
 #gdalwarp -t_srs "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0" -tr 10 10 -r bilinear $working_dir/$tile/${tile}_tmp.tif  $working_dir/$tile/${tile}.tif 
 
 #gdalwarp --config GDAL_CACHEMAX 9000 -wm 9000 -multi -wo NUM_THREADS=ALL_CPUS -t_srs "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0" -tr 10 10 -r bilinear -cutline $indexA -cwhere "$fieldname = '${tile}'" -crop_to_cutline -cblend $bufferA $DEM $working_dir/$tile/${tile}.tif
