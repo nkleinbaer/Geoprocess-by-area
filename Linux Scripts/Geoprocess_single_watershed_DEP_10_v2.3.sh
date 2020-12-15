@@ -84,9 +84,19 @@ function Compress()  # $1: "_" + "name of derivative"
   rm $working_dir/$tile/${tile}${1}.tif 
 }
 
+#Prepare shapefile
+echo now preping shapefile
+echo $indexA
+export cutline_shp=$working_dir/$tile/${tile}_simple.shp
+ogr2ogr -where "$fieldname = '${tile}'" $working_dir/$tile/${tile}.shp $indexA
+ogr2ogr -simplify .001 $cutline_shp $working_dir/$tile/${tile}.shp
 #Clip DEM to HUC8 watershed boundary.
 echo now subsetting $fieldname $tile
-gdalwarp --config GDAL_CACHEMAX 9999 -wm 9999 -multi -co NUM_THREADS=ALL_CPUS -wo NUM_THREADS=ALL_CPUS -t_srs "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0" -tr 10 10 -r bilinear -cutline $indexA -cwhere "$fieldname = '${tile}'" -crop_to_cutline -cblend $bufferA $DEM $working_dir/$tile/${tile}.tif
+gdalwarp -cutline $cutline_shp -crop_to_cutline -cblend $bufferA $DEM $working_dir/$tile/${tile}_tmp.tif
+gdalwarp -t_srs EPSG:5070 -tr 10 10 -r bilinear $working_dir/$tile/${tile}_tmp.tif -of SAGA $working_dir/$tile/${tile}.tif
+#gdalwarp -t_srs "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0" -tr 10 10 -r bilinear $working_dir/$tile/${tile}_tmp.tif  $working_dir/$tile/${tile}.tif 
+
+#gdalwarp --config GDAL_CACHEMAX 9000 -wm 9000 -multi -wo NUM_THREADS=ALL_CPUS -t_srs "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0" -tr 10 10 -r bilinear -cutline $indexA -cwhere "$fieldname = '${tile}'" -crop_to_cutline -cblend $bufferA $DEM $working_dir/$tile/${tile}.tif
 
 #Smooth DEM to remove data artifacts using circle with radius of 4 cells) smoothing filter
 echo now smoothing $fieldname $tile
@@ -101,7 +111,8 @@ Compress
   function Trim_gdalwarp() # $1: name of derivative
   {
     #Modified to change output file type and enforce default resolution.
-    gdalwarp --config GDAL_CACHEMAX 9999 -wm 9999 -multi -co NUM_THREADS=ALL_CPUS -wo NUM_THREADS=ALL_CPUS -cutline $indexB -cwhere "$fieldname = '${tile}'" -cblend $bufferB -crop_to_cutline -tr 10 10 -r bilinear $working_dir/$tile/${tile}_${1}A.sdat $working_dir/$tile/${tile}_${1}.tif
+    gdalwarp -cutline $cutline_shp -cblend $bufferB -crop_to_cutline -tr 10 10 -r bilinear $working_dir/$tile/${tile}_${1}A.sdat $working_dir/$tile/${tile}_${1}.tif
+    #gdalwarp --config GDAL_CACHEMAX 9999 -wm 9999 -multi -co NUM_THREADS=ALL_CPUS -wo NUM_THREADS=ALL_CPUS -cutline $indexB -cwhere "$fieldname = '${tile}'" -cblend $bufferB -crop_to_cutline -tr 10 10 -r bilinear $working_dir/$tile/${tile}_${1}A.sdat $working_dir/$tile/${tile}_${1}.tif
   }
 
 # 3. Remove intermediate files to save space.
